@@ -27,6 +27,16 @@ const config = {
       borderColor: ({ theme }) => ({
         DEFAULT: theme("colors.border[100]"),
       }),
+      animation: {
+        "fade-out":
+          "fade-out var(--duration, 200ms) theme(transitionTimingFunction.in)",
+      },
+      keyframes: {
+        "fade-out": {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
+      },
     },
   },
   plugins: [],

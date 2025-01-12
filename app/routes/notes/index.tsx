@@ -86,21 +86,21 @@ const NoteCard: React.FC<{
         className="absolute inset-0 -z-10 size-full text-black/[.025]"
       />
       <h4
-        className="truncate text-sm/6 font-semibold text-zinc-900"
+        className="flex items-center gap-1 text-sm/6 font-semibold text-zinc-900"
         title={note.title ?? undefined}
       >
-        {note.title ?? "Empty"}
+        {note.type === "draft" && (
+          <span className="flex-none" title="Draft">
+            <Icons.dot className="-ml-1.5 size-5 text-yellow-400" />
+          </span>
+        )}
+        <span className="flex-1 truncate">{note.title ?? "Empty"}</span>
       </h4>
       <p className="line-clamp-3 flex-1 text-sm/6">
         {note.preview ?? "No additional text"}
       </p>
       <p className="mt-2 grid grid-cols-[1fr_auto] text-[0.8rem]/6 text-zinc-500">
         <span>{noteTime(note.updatedAt)}</span>
-        {note.type === "draft" && (
-          <span className="self-center" title="Draft">
-            <Icons.dot className="size-5 text-yellow-400" />
-          </span>
-        )}
       </p>
     </Link>
   );
