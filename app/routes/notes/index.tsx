@@ -4,7 +4,9 @@ import { Link, useLoaderData } from "react-router";
 import { createId } from "@paralleldrive/cuid2";
 
 import { $auth } from "~/auth/index.server";
+import { EmptyPattern } from "~/components/empty-pattern";
 import { LoadingFallback } from "~/components/fallbacks";
+import { Icons } from "~/components/icons";
 import { Button } from "~/components/ui/button";
 import { PageHeading, PageHeadingRoot } from "~/components/ui/headings";
 import { $$notes } from "~/routes/notes/notes";
@@ -72,24 +74,33 @@ export default function NotesPage() {
 const NoteCard: React.FC<{
   note: NotesType;
 }> = ({ note }) => {
+  const isEmpty = !note.title && !note.content;
+
   return (
     <Link
       to={`/notes/${note.id}`}
-      className="flex flex-col gap-y-1.5 rounded-xl border bg-white p-6 shadow-sm transition-colors hover:bg-zinc-50 data-[type=draft]:border-dashed"
-      data-type={note.type}
+      className="relative isolate flex min-h-48 flex-col gap-y-1.5 overflow-hidden rounded-xl border bg-white p-6 shadow-sm transition-colors hover:bg-zinc-50"
     >
+      <EmptyPattern
+        show={isEmpty}
+        className="absolute inset-0 -z-10 size-full text-black/[.025]"
+      />
       <h4
-        className="truncate font-display text-sm/6 font-semibold text-zinc-900"
+        className="truncate text-sm/6 font-semibold text-zinc-900"
         title={note.title ?? undefined}
       >
-        {note.title ?? "No title"}
+        {note.title ?? "Empty"}
       </h4>
       <p className="line-clamp-3 flex-1 text-sm/6">
         {note.preview ?? "No additional text"}
       </p>
       <p className="mt-2 grid grid-cols-[1fr_auto] text-[0.8rem]/6 text-zinc-500">
         <span>{noteTime(note.updatedAt)}</span>
-        {note.type === "draft" && <span>Draft</span>}
+        {note.type === "draft" && (
+          <span className="self-center" title="Draft">
+            <Icons.dot className="size-5 text-yellow-400" />
+          </span>
+        )}
       </p>
     </Link>
   );
