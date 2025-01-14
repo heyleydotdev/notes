@@ -1,6 +1,7 @@
 import type { Route } from ".react-router/types/app/routes/notes/+types/edit";
+import type { EditorOnChangeState } from "~/components/editor";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Link,
   redirect,
@@ -9,13 +10,15 @@ import {
   useLoaderData,
 } from "react-router";
 import SuperJSON from "superjson";
+import { useDebouncedCallback } from "use-debounce";
 
 import { $auth } from "~/auth/index.server";
 import { Editor } from "~/components/editor";
 import { LoadingFallback } from "~/components/fallbacks";
+import { Icons } from "~/components/icons";
 import { Button, PendingButton } from "~/components/ui/button";
 import { PageHeading } from "~/components/ui/headings";
-import { useDebounce } from "~/hooks/use-debounce";
+import { useBeforeUnload } from "~/hooks/use-before-unload";
 import { $$notes } from "~/routes/notes/notes";
 import { $notes } from "~/routes/notes/notes.server";
 import { cuidSchema } from "~/utils/misc";
@@ -45,7 +48,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const note = await $notes.init(params.id, user.id);
     if (!note) {
-      console.log(note);
       return redirect("/notes");
     }
 
@@ -70,46 +72,54 @@ export default function EditPage() {
   const fetcher = useFetcher<typeof action>();
 
   const [state, setState] = useState<typeof $$notes.schema.$infer>(draft);
-  const debouncedState = useDebounce(state, 300);
+  const [valid, setValid] = useState(
+    $$notes.editorSchema.safeParse(state).success,
+  );
 
+  const isEmpty = note.title === null;
   const isDirty = note.content !== state.content;
-  const canSave = $$notes.schema
-    .pick({ title: true, content: true })
-    .required()
-    .safeParse(state).success;
 
-  useEffect(() => {
-    $$notes.update(debouncedState.id, {
-      ...debouncedState,
-      updatedAt: new Date(),
-    });
-  }, [debouncedState]);
+  const onChangeHandler = useDebouncedCallback(
+    async (editor: EditorOnChangeState) => {
+      const valid = $$notes.editorSchema.safeParse(editor).success;
+      setValid(valid);
+
+      const newState: typeof $$notes.schema.$infer = {
+        ...state,
+        ...editor,
+        updatedAt: new Date(),
+      };
+      setState(newState);
+
+      if (valid) {
+        $$notes.update(state.id, newState);
+      }
+    },
+    300,
+  );
 
   useBlocker(() => {
     return (
-      isDirty &&
+      (isEmpty || isDirty) &&
       !window.confirm(
-        "You have unsaved changes. Are you sure you want to leave without saving?",
+        isEmpty
+          ? "Save your changes to keep this note. Leaving the page will discard it."
+          : "You have unsaved changes. Are you sure you want to leave without saving?",
       )
     );
   });
+
+  useBeforeUnload(isEmpty || isDirty);
 
   return (
     <div className="space-y-6">
       <PageHeading className="max-md:line-clamp-2 md:w-5/6 md:truncate">
         {state.title ?? "Compose a Note"}
       </PageHeading>
-      <Editor
-        initContent={draft.content}
-        onChange={(state) => {
-          setState((prev) => ({ ...prev, ...state }));
-        }}
-      />
+      <Editor initContent={draft.content} onChange={onChangeHandler} />
       <div className="flex items-center gap-2">
         <div className="flex-1">
-          <p className="text-[0.8rem]/6 text-zinc-500">
-            Status: {isDirty ? "Draft" : "Saved"}
-          </p>
+          <NoteStatus isDirty={isDirty} />
         </div>
         <div className="contents">
           <Button variant="outline" asChild>
@@ -117,7 +127,7 @@ export default function EditPage() {
           </Button>
           <PendingButton
             pending={fetcher.state !== "idle"}
-            disabled={!isDirty || !canSave}
+            disabled={!isDirty || !valid}
             onClick={() => {
               fetcher.submit(
                 SuperJSON.stringify({ ...state, intent: $$notes.INTENTS.SAVE }),
@@ -132,3 +142,15 @@ export default function EditPage() {
     </div>
   );
 }
+
+const NoteStatus: React.FC<{ isDirty: boolean }> = ({ isDirty }) => (
+  <p className="flex w-max items-center gap-0.5 rounded-full border border-border-50 bg-zinc-50 pl-1.5 pr-2.5 text-[0.8rem]/6 text-zinc-500">
+    <span>
+      <Icons.dot
+        data-draft={isDirty}
+        className="-ml-1 size-5 text-green-500 data-[draft=true]:text-yellow-400"
+      />
+    </span>
+    <span>{isDirty ? "Draft" : "Saved"}</span>
+  </p>
+);

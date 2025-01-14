@@ -4,7 +4,6 @@ import { Link, useLoaderData } from "react-router";
 import { createId } from "@paralleldrive/cuid2";
 
 import { $auth } from "~/auth/index.server";
-import { EmptyPattern } from "~/components/empty-pattern";
 import { LoadingFallback } from "~/components/fallbacks";
 import { Icons } from "~/components/icons";
 import { Button } from "~/components/ui/button";
@@ -34,7 +33,8 @@ export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
       if (
         draft &&
         draft.updatedAt > note.updatedAt &&
-        draft.title !== undefined
+        draft.title !== undefined &&
+        draft.content !== note.content
       ) {
         return { ...note, ...draft, type: "draft" };
       }
@@ -66,6 +66,7 @@ export default function NotesPage() {
         {notes.map((note) => (
           <NoteCard key={note.id} note={note} />
         ))}
+        <EmptyFallback />
       </div>
     </div>
   );
@@ -74,17 +75,13 @@ export default function NotesPage() {
 const NoteCard: React.FC<{
   note: NotesType;
 }> = ({ note }) => {
-  const isEmpty = !note.title && !note.content;
+  const dateTitle = `Created: ${note.createdAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}\nUpdated: ${note.updatedAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}`;
 
   return (
     <Link
       to={`/notes/${note.id}`}
       className="relative isolate flex min-h-48 flex-col gap-y-1.5 overflow-hidden rounded-xl border bg-white p-6 shadow-sm transition-colors hover:bg-zinc-50"
     >
-      <EmptyPattern
-        show={isEmpty}
-        className="absolute inset-0 -z-10 size-full text-black/[.025]"
-      />
       <h4
         className="flex items-center gap-1 text-sm/6 font-semibold text-zinc-900"
         title={note.title ?? undefined}
@@ -100,8 +97,25 @@ const NoteCard: React.FC<{
         {note.preview ?? "No additional text"}
       </p>
       <p className="mt-2 grid grid-cols-[1fr_auto] text-[0.8rem]/6 text-zinc-500">
-        <span>{noteTime(note.updatedAt)}</span>
+        <span title={dateTitle}>{noteTime(note.updatedAt)}</span>
       </p>
     </Link>
+  );
+};
+
+const EmptyFallback: React.FC = () => {
+  const { notes } = useLoaderData<typeof clientLoader>();
+
+  if (notes.length > 0) {
+    return null;
+  }
+
+  return (
+    <div className="col-span-3 flex flex-col items-center justify-center rounded-xl border border-dashed bg-zinc-50 p-6 py-16 text-center">
+      <span className="size-8 rounded-full border border-dashed border-border-150 bg-zinc-100 p-1 text-zinc-500">
+        <Icons.empty className="size-full" />
+      </span>
+      <p className="mt-1.5 text-sm/6 text-zinc-500">No notes found</p>
+    </div>
   );
 };

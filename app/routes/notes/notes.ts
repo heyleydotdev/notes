@@ -18,6 +18,7 @@ enum INTENTS {
 
 export const $$notes = {
   schema,
+  editorSchema: schema.pick({ title: true, content: true }).required(),
   INTENTS,
 
   get: async (key: string) => {

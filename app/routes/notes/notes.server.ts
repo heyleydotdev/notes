@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "~/db/index.server";
 import { tNote } from "~/db/schema.server";
@@ -39,8 +39,11 @@ export const $notes = {
   },
 
   getAll: (userId: string) => {
+    db.delete(tNote).where(and(eq(tNote.userId, userId), isNull(tNote.title)));
+
     return db.query.tNote.findMany({
-      where: (fields, ops) => ops.and(ops.eq(fields.userId, userId)),
+      where: (fields, ops) =>
+        ops.and(ops.eq(fields.userId, userId), isNotNull(fields.title)),
       columns: { userId: false },
       orderBy: (fields, ops) => ops.desc(fields.updatedAt),
     });
