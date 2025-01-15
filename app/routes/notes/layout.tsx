@@ -7,7 +7,7 @@ export default function NotesLayout() {
   return (
     <div className="flex min-h-full flex-col">
       <SiteHeader />
-      <main className="container flex flex-1 flex-col pb-24 pt-10">
+      <main className="container flex flex-1 flex-col pb-28 pt-10">
         <NavigationFallback>
           <Outlet />
         </NavigationFallback>

@@ -37,7 +37,7 @@ export default function NotesPage() {
   const { compose, notes } = useLoaderData<typeof clientLoader>();
 
   return (
-    <div>
+    <>
       <PageHeadingRoot>
         <PageHeading>Your Notes</PageHeading>
         <Button asChild>
@@ -51,7 +51,7 @@ export default function NotesPage() {
         ))}
         <EmptyFallback />
       </div>
-    </div>
+    </>
   );
 }
 

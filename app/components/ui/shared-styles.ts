@@ -16,7 +16,9 @@ export const tvButton = tv({
   variants: {
     variant: {
       default:
-        "bg-zinc-900 from-white/10 text-zinc-50 after:absolute after:inset-0 after:bg-gradient-to-b hover:bg-zinc-700 focus-visible:ring-black/15",
+        "bg-zinc-900 text-zinc-50 after:absolute after:inset-0 after:bg-gradient-to-b after:from-white/10 hover:bg-zinc-700 focus-visible:ring-black/15",
+      destructive:
+        "bg-red-600 text-zinc-50 after:absolute after:inset-0 after:bg-gradient-to-b after:from-white/10 hover:bg-red-500 focus-visible:ring-red-600/15",
       outline:
         "bg-white outline outline-1 -outline-offset-1 outline-border-100 hover:bg-black/[0.025] focus-visible:outline focus-visible:outline-border-150",
     },
