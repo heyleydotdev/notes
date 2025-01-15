@@ -23,6 +23,18 @@ export const $notes = {
       });
   },
 
+  getAll: async (userId: string) => {
+    await db
+      .delete(tNote)
+      .where(and(eq(tNote.userId, userId), isNull(tNote.title)));
+    return db.query.tNote.findMany({
+      where: (fields, ops) =>
+        ops.and(ops.eq(fields.userId, userId), isNotNull(fields.title)),
+      columns: { userId: false },
+      orderBy: (fields, ops) => ops.desc(fields.updatedAt),
+    });
+  },
+
   save: async (userId: string, input: unknown) => {
     const data = $$notes.schema.parse(input);
 
@@ -38,14 +50,10 @@ export const $notes = {
     return { saved: true };
   },
 
-  getAll: (userId: string) => {
-    db.delete(tNote).where(and(eq(tNote.userId, userId), isNull(tNote.title)));
-
-    return db.query.tNote.findMany({
-      where: (fields, ops) =>
-        ops.and(ops.eq(fields.userId, userId), isNotNull(fields.title)),
-      columns: { userId: false },
-      orderBy: (fields, ops) => ops.desc(fields.updatedAt),
-    });
+  delete: (userId: string, id: string) => {
+    return db
+      .delete(tNote)
+      .where(and(eq(tNote.id, id), eq(tNote.userId, userId)))
+      .returning({ deleted: tNote.id });
   },
 };

@@ -8,6 +8,7 @@
     "start": "cross-env NODE_ENV=production react-router-serve ./build/server/index.js",
     "lint": "eslint .",
     "typecheck": "react-router typegen && tsc",
+    "check": "bun run lint && bun run typecheck",
     "clean": "git clean -xdf .react-router build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

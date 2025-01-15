@@ -18,6 +18,7 @@ const schema = z.object({
 
 enum intents {
   SAVE = "save",
+  DELETE = "delete",
 }
 
 export const $$notes = {

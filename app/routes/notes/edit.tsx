@@ -24,7 +24,7 @@ import { $notes } from "~/routes/notes/notes.server";
 import { cuidSchema } from "~/utils/misc";
 import { $action, ActionError } from "~/utils/misc.server";
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
   return $action(() =>
     $auth.permitUsers(request, async ({ user }) => {
       const requestJSON = await request.json();
@@ -33,6 +33,8 @@ export async function action({ request }: Route.ActionArgs) {
       switch (input.intent) {
         case $$notes.intents.SAVE:
           return $notes.save(user.id, input);
+        case $$notes.intents.DELETE:
+          return $notes.delete(user.id, params.id);
         default:
           throw new ActionError("Unknown action");
       }

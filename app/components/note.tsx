@@ -1,7 +1,11 @@
+import type { action } from "~/routes/notes/edit";
 import type { MergedType } from "~/routes/notes/notes";
 
-import { Link } from "react-router";
+import { Link, useFetcher } from "react-router";
+import SuperJSON from "superjson";
 
+import { ConfirmDialog } from "~/components/contexts/confirm/dialog";
+import { useConfirmDialog } from "~/components/contexts/confirm/use-dialog";
 import { Icons } from "~/components/icons";
 import {
   DropdownMenu,
@@ -9,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown";
+import { $$notes } from "~/routes/notes/notes";
 import { noteTime } from "~/utils/misc";
 
 const NoteCard: React.FC<{ note: MergedType }> = ({ note }) => {
@@ -48,20 +53,40 @@ const NoteStatus: React.FC<{ isDraft: boolean }> = ({ isDraft }) => {
 };
 
 const NoteOptions: React.FC<{ id: MergedType["id"] }> = ({ id }) => {
+  const confirm = useConfirmDialog();
+  const fetcher = useFetcher<typeof action>();
+
+  const _onDelete = async () => {
+    await fetcher.submit(
+      SuperJSON.stringify({ intent: $$notes.intents.DELETE }),
+      {
+        action: `/notes/${id}`,
+        method: "POST",
+        encType: "application/json",
+      },
+    );
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="z-10 -mx-1 -my-1 inline-flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-black/5 hover:text-zinc-900 focus:outline-none focus-visible:ring focus-visible:ring-border-100 data-[state=open]:bg-black/5">
-        <Icons.ellipsis className="size-4" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end">
-        <DropdownMenuItem asChild>
-          <Link to={`/notes/${id}`}>Edit</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-red-600 focus:bg-red-50">
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="z-10 -m-2 inline-flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-black/5 hover:text-zinc-900 focus:outline-none focus-visible:ring focus-visible:ring-border-100 data-[state=open]:bg-black/5">
+          <Icons.ellipsis className="size-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="left" align="start">
+          <DropdownMenuItem asChild>
+            <Link to={`/notes/${id}`}>Edit</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-red-600 focus:bg-red-50"
+            onClick={confirm.open}
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <ConfirmDialog {...confirm} onContinue={_onDelete} />
+    </>
   );
 };
 

@@ -27,6 +27,8 @@ const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
+const AlertDialogActionHeadless = AlertDialogPrimitive.Action;
+
 const AlertDialogOverlay: React.FC<
   React.ComponentPropsWithRef<typeof AlertDialogPrimitive.Overlay>
 > = ({ className, ...rest }) => (
@@ -103,5 +105,6 @@ export {
   AlertDialogBody,
   AlertDialogFooter,
   AlertDialogAction,
+  AlertDialogActionHeadless,
   AlertDialogCancel,
 };
