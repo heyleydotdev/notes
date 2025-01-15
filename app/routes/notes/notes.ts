@@ -60,6 +60,17 @@ export const $$notes = {
     return exists;
   },
 
+  clean: async () => {
+    const keys = await forge.keys();
+    const removes = keys.map(async (_key) => {
+      const note = await forge.getItem<typeof schema.$infer>(_key);
+      if (note?.id && !note.title) {
+        await $$notes.remove(note.id);
+      }
+    });
+    Promise.all(removes);
+  },
+
   merge: async (
     serverNotes: (typeof schema.$infer)[],
   ): Promise<MergedType[]> => {

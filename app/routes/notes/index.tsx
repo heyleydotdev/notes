@@ -24,6 +24,7 @@ export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
 
   const { notes: serverNotes } = await serverLoader();
   const notes = await $$notes.merge(serverNotes);
+  await $$notes.clean();
 
   return { compose, notes };
 }
