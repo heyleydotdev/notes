@@ -3,6 +3,10 @@ import { z } from "zod";
 
 import { cuidSchema } from "~/utils/misc";
 
+export type MergedType = typeof schema.$infer & {
+  type: "saved" | "draft";
+};
+
 const schema = z.object({
   id: cuidSchema,
   title: z.string().min(1).max(128).nullish(),
@@ -12,14 +16,14 @@ const schema = z.object({
   updatedAt: z.date(),
 });
 
-enum INTENTS {
+enum intents {
   SAVE = "save",
 }
 
 export const $$notes = {
+  intents,
   schema,
   editorSchema: schema.pick({ title: true, content: true }).required(),
-  INTENTS,
 
   get: async (key: string) => {
     const note = await forge.getItem(key);
@@ -53,5 +57,24 @@ export const $$notes = {
       return $$notes.set(note);
     }
     return exists;
+  },
+
+  merge: async (
+    serverNotes: (typeof schema.$infer)[],
+  ): Promise<MergedType[]> => {
+    return Promise.all(
+      serverNotes.map(async (note) => {
+        const draft = await $$notes.get(note.id);
+        if (
+          draft &&
+          draft.updatedAt > note.updatedAt &&
+          draft.title !== undefined &&
+          draft.content !== note.content
+        ) {
+          return { ...note, ...draft, type: "draft" };
+        }
+        return { ...note, type: "saved" };
+      }),
+    );
   },
 };

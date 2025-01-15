@@ -25,7 +25,7 @@ export default function UserNavigation() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" className="w-64">
             <DropdownMenuLabel>
-              <p className="truncate text-sm/6 font-medium text-zinc-950">
+              <p className="truncate text-[0.8rem]/6 font-medium text-zinc-950">
                 {user.name}
               </p>
               <p className="truncate text-xs/5 text-zinc-500">{user.email}</p>

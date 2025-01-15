@@ -4,10 +4,10 @@ import { tv } from "tailwind-variants";
 const { content, item, label, separator } = tv({
   slots: {
     content: [
-      "z-50 min-w-36 rounded-xl bg-white p-1 shadow-lg ring-1 ring-inset ring-border-150 will-change-[transform,opacity,top,left] focus:outline-none",
+      "z-50 min-w-36 rounded-xl bg-white p-1 shadow-lg ring-1 ring-inset ring-border-100 will-change-[transform,opacity,top,left] focus:outline-none",
       "data-[state=closed]:animate-fade-out",
     ],
-    item: "group flex w-full cursor-default items-center gap-2 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 focus:bg-zinc-100 focus:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-80 [&>svg]:size-4 [&>svg]:shrink-0",
+    item: "group flex w-full cursor-default items-center gap-2 rounded-lg px-3 py-1.5 text-[0.8rem]/6 text-zinc-950 focus:bg-zinc-100 focus:outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-80 [&>svg]:size-4 [&>svg]:shrink-0",
     label: "min-w-0 px-3 py-1 text-xs/5",
     separator: "mx-3 my-1 h-px border-t border-border-50",
   },

@@ -7,6 +7,7 @@ import {
   AlignRightIcon,
   BoldIcon,
   CircleSlashIcon,
+  EllipsisIcon,
   ItalicIcon,
   Redo2Icon,
   SpellCheckIcon,
@@ -28,6 +29,7 @@ export const Icons = {
   alignright: AlignRightIcon,
   alignjustify: AlignJustifyIcon,
   empty: CircleSlashIcon,
+  ellipsis: EllipsisIcon,
   dot: (props: LucideProps) => (
     <svg
       stroke="currentColor"

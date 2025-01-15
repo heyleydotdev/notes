@@ -31,7 +31,7 @@ export async function action({ request }: Route.ActionArgs) {
       const input = SuperJSON.deserialize<{ intent: string }>(requestJSON);
 
       switch (input.intent) {
-        case $$notes.INTENTS.SAVE:
+        case $$notes.intents.SAVE:
           return $notes.save(user.id, input);
         default:
           throw new ActionError("Unknown action");
@@ -130,7 +130,7 @@ export default function EditPage() {
             disabled={!isDirty || !valid}
             onClick={() => {
               fetcher.submit(
-                SuperJSON.stringify({ ...state, intent: $$notes.INTENTS.SAVE }),
+                SuperJSON.stringify({ ...state, intent: $$notes.intents.SAVE }),
                 { method: "POST", encType: "application/json" },
               );
             }}
