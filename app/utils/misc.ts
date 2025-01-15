@@ -62,3 +62,20 @@ export const noteTime = (date: Date) => {
       return date.toLocaleDateString("en-US", { dateStyle: "short" });
   }
 };
+
+type RemoveErrorState<T> = T extends { [ERROR_SYMBOL]: true } ? never : T;
+type RemoveSuccessState<T> = T extends { [ERROR_SYMBOL]: true } ? T : never;
+
+export const isActionError = <T>(data: T): data is RemoveSuccessState<T> => {
+  return !!data && typeof data === "object" && ERROR_SYMBOL in data;
+};
+
+export const isActionSuccess = <T>(data: T): data is RemoveErrorState<T> => {
+  return !!data && typeof data === "object" && !(ERROR_SYMBOL in data);
+};
+
+export const useInferAction = <T>(data: T) => {
+  const _data = isActionSuccess(data) ? data : undefined;
+  const error = isActionError(data) ? data : undefined;
+  return { data: _data, error };
+};

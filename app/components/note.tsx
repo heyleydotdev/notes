@@ -1,7 +1,7 @@
 import type { action } from "~/routes/notes/edit";
 import type { MergedType } from "~/routes/notes/notes";
 
-import { Link, useFetcher } from "react-router";
+import { Link, useFetcher, useNavigate } from "react-router";
 import SuperJSON from "superjson";
 
 import { ConfirmDialog } from "~/components/contexts/confirm/dialog";
@@ -34,7 +34,11 @@ const NoteCard: React.FC<{ note: MergedType }> = ({ note }) => {
       <p className="line-clamp-3 flex-1 text-sm/6">{content}</p>
       <p className="mt-2 grid grid-cols-[1fr_auto] text-[0.8rem]/6 text-zinc-500">
         <span>{updatedAt}</span>
-        <NoteOptions id={note.id} />
+        <NoteOptions id={note.id}>
+          <button className="z-10 -m-2 inline-flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-black/5 hover:text-zinc-900 focus:outline-none focus-visible:ring focus-visible:ring-border-100 data-[state=open]:bg-black/5">
+            <Icons.ellipsis className="size-4" />
+          </button>
+        </NoteOptions>
       </p>
     </div>
   );
@@ -52,9 +56,26 @@ const NoteStatus: React.FC<{ isDraft: boolean }> = ({ isDraft }) => {
   );
 };
 
-const NoteOptions: React.FC<{ id: MergedType["id"] }> = ({ id }) => {
+const NOTE_OPTIONS_SIDE = {
+  left: { side: "left", align: "start" },
+  bottom: { side: "bottom", align: "end" },
+} as const;
+
+interface NoteOptionsProps {
+  id: MergedType["id"];
+  side?: keyof typeof NOTE_OPTIONS_SIDE;
+  isOnEdit?: boolean;
+}
+
+const NoteOptions: React.FC<React.PropsWithChildren<NoteOptionsProps>> = ({
+  id,
+  side = "left",
+  isOnEdit,
+  children,
+}) => {
   const confirm = useConfirmDialog();
-  const fetcher = useFetcher<typeof action>();
+  const navigate = useNavigate();
+  const fetcher = useFetcher<typeof action>({ key: `delete-${id}` });
 
   const _onDelete = async () => {
     await fetcher.submit(
@@ -65,18 +86,21 @@ const NoteOptions: React.FC<{ id: MergedType["id"] }> = ({ id }) => {
         encType: "application/json",
       },
     );
+    if (isOnEdit) {
+      navigate("/notes");
+    }
   };
 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="z-10 -m-2 inline-flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-black/5 hover:text-zinc-900 focus:outline-none focus-visible:ring focus-visible:ring-border-100 data-[state=open]:bg-black/5">
-          <Icons.ellipsis className="size-4" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="left" align="start">
-          <DropdownMenuItem asChild>
-            <Link to={`/notes/${id}`}>Edit</Link>
-          </DropdownMenuItem>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent {...NOTE_OPTIONS_SIDE[side]}>
+          {!isOnEdit && (
+            <DropdownMenuItem asChild>
+              <Link to={`/notes/${id}`}>Edit</Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-red-600 focus:bg-red-50"
             onClick={confirm.open}
@@ -90,4 +114,4 @@ const NoteOptions: React.FC<{ id: MergedType["id"] }> = ({ id }) => {
   );
 };
 
-export { NoteCard };
+export { NoteCard, NoteOptions };

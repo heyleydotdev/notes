@@ -54,6 +54,7 @@ export const $notes = {
     return db
       .delete(tNote)
       .where(and(eq(tNote.id, id), eq(tNote.userId, userId)))
-      .returning({ deleted: tNote.id });
+      .returning({ deleted: tNote.id })
+      .then((res) => ({ deleted: res[0]?.deleted }));
   },
 };
