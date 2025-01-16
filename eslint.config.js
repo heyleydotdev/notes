@@ -5,7 +5,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".react-router"] },
+  { ignores: ["build", ".react-router"] },
   {
     files: ["**/*.{ts,tsx,js,jsx}", "**/*.{server,client}.{ts,tsx,js,jsx}"],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
