@@ -22,14 +22,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function SigninPage() {
   return (
-    <Card>
+    <Card className="rounded-2xl">
       <CardHeader className="text-center">
-        <CardTitle>Sign in to Notes</CardTitle>
+        <CardTitle>Create an account</CardTitle>
         <CardDescription>
-          Welcome back! Please sign in to continue
+          Welcome! Choose your favorite provider to get started
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-3">
         <OAuthButton provider="github" icon="github">
           Continue with Github
         </OAuthButton>

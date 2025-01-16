@@ -14,6 +14,7 @@ import {
 import { authClient } from "~/auth/client";
 import { SessionProvider } from "~/components/contexts/session/provider";
 import stylesheet from "~/styles/globals.css?url";
+import { __envClient } from "~/utils/env.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,15 +34,16 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-export function meta() {
+export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: "Notes" },
+    { title: data.env.APP_NAME },
     { name: "description", content: "Notes app with React Router v7" },
   ];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
   let setCookieHeader: string[] = [];
+  const env = __envClient();
 
   const { data: session } = await authClient.getSession({
     fetchOptions: {
@@ -55,7 +57,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const headers = new Headers();
   setCookieHeader.forEach((cookie) => headers.append("Set-Cookie", cookie));
 
-  return data({ session }, { headers });
+  return data({ session, env }, { headers });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
