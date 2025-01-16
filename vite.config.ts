@@ -16,11 +16,21 @@ const envValidator = (): Plugin => {
   };
 };
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild, command }) => ({
+  build: {
+    rollupOptions: isSsrBuild
+      ? {
+          input: "./app/server.ts",
+        }
+      : undefined,
+  },
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer],
     },
   },
+  ssr: {
+    noExternal: command === "build" ? true : undefined,
+  },
   plugins: [reactRouter(), tsconfigPaths(), envValidator()],
-});
+}));
