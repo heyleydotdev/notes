@@ -11,6 +11,7 @@ declare module "react-router" {
 
 const app = express();
 
+app.disable("x-powered-by");
 app.use(
   createRequestHandler({
     // @ts-expect-error - virtual module provided by React Router at build time

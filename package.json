@@ -13,6 +13,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
+    "db:push:prod": "bun --env-file=.env.production.local run db:push",
     "db:studio": "drizzle-kit studio",
     "db:auth": "bunx @better-auth/cli generate --config ./app/auth/index.server.ts --output auth-schema.ts -y"
   },
