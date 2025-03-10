@@ -6,6 +6,7 @@ export default [
   index("routes/index.tsx"),
 
   route("/api/auth/*", "routes/auth/api.tsx"),
+
   layout("routes/auth/layout.tsx", [
     route("/signin", "routes/auth/signin.tsx"),
   ]),

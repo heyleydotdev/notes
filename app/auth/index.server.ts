@@ -68,7 +68,12 @@ globals.activeGetSession ??= new Map();
 export const $auth = {
   getSession: async (request: Request) => {
     const cookies = parse(request.headers.get("cookie") ?? "");
-    const token = cookies["better-auth.session_token"];
+    const cookieName =
+      process.env.NODE_ENV === "development"
+        ? "better-auth.session_token"
+        : "__Secure-better-auth.session_token";
+
+    const token = cookies[cookieName];
     if (!token) {
       return null;
     }
